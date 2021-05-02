@@ -3,8 +3,10 @@
 require "lfs"
 require "lib/file"
 
-inputDir = arg[1]
-outputDir = arg[2]
+-- Settings
+config = require "config"
+if not config.inputDir then config.inputDir = arg[1] end
+if not config.outputDir then config.outputDir = arg[2] end
 
 -- Read through a directory
 function handleDirectory (dir)
@@ -17,7 +19,7 @@ function handleDirectory (dir)
 
             if attributes.mode == "directory" then
                 -- Recreate this directory in the output location
-                local newDir = string.gsub (path, inputDir, outputDir)
+                local newDir = string.gsub (path, config.inputDir, config.outputDir)
                 lfs.mkdir (newDir)
 
                 -- Explore found directories recursively
@@ -45,11 +47,11 @@ function handleFile (inputFile)
 
         -- Modify path to match the output directory
         local outputFile = joinFilePath (path)
-        outputFile = string.gsub (outputFile, inputDir, outputDir)
+        outputFile = string.gsub (outputFile, config.inputDir, config.outputDir)
 
         os.execute ("pandoc -i "..inputFile.." -o "..outputFile)
         print (inputFile)
     end
 end
 
-handleDirectory (inputDir)
+handleDirectory (config.inputDir)
