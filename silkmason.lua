@@ -1,10 +1,8 @@
 require "lfs"
+require "lib/file"
 
 inputDir = arg[1]
 outputDir = arg[2]
-
--- Check if a file is marked as hidden
-local function isHidden (filename) return string.sub (filename, 1, 1) ~= '.' end
 
 function handleDirectory (dir)
     for file in lfs.dir (dir) do
