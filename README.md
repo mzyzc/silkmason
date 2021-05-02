@@ -1,2 +1,3 @@
-# silkmason
-A pandoc-based static site generator
+# SilkMason
+
+A very simple static site generator based on pandoc
