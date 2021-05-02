@@ -4,37 +4,50 @@ require "lib/file"
 inputDir = arg[1]
 outputDir = arg[2]
 
+-- Read through a directory
 function handleDirectory (dir)
     for file in lfs.dir (dir) do
-        if isHidden (file) then
-            local attributes = lfs.attributes (dir..'/'..file)
+        local path = dir..'/'..file
+
+        -- Ignore hidden files
+        if (not isHidden (file)) then
+            local attributes = lfs.attributes (path)
+
             if attributes.mode == "directory" then
-                local prefixDir = string.gsub (dir, inputDir, outputDir)
-                lfs.mkdir (prefixDir..'/'..file)
-                handleDirectory (dir..'/'..file)
+                -- Recreate this directory in the output location
+                local newDir = string.gsub (path, inputDir, outputDir)
+                lfs.mkdir (newDir)
+
+                -- Explore found directories recursively
+                handleDirectory (path)
             elseif attributes.mode == "file" then
-                handleFile (dir..'/'..file)
+                handleFile (path)
             end
         end
     end
 end
 
-function handleFile (file)
-    local splitFile = splitFilePath (file)
-    splitFile[#splitFile] = splitFileName (splitFile[#splitFile])
+-- Decide what to do with a file based on its type
+function handleFile (inputFile)
+    local path = splitFilePath (inputFile)
 
-    local baseFile = splitFile[#splitFile]
+    local file = splitFileName (path[#path])
+    path[#path] = file
+
+    local extension = file[#file]
 
     -- Convert Markdown files to HTML
-    if baseFile[#baseFile] == "md" then
-        baseFile[#baseFile] = "html"
-        local outputFile = '/'..joinFilePath (splitFile)
+    if extension == "md" then
+        extension = "html"
+        file[#file] = extension
+
+        -- Modify path to match the output directory
+        local outputFile = joinFilePath (path)
         outputFile = string.gsub (outputFile, inputDir, outputDir)
 
-        os.execute ("pandoc -i "..file.." -o "..outputFile)
+        os.execute ("pandoc -i "..inputFile.." -o "..outputFile)
+        print (inputFile)
     end
-
-    print (file)
 end
 
 handleDirectory (inputDir)
