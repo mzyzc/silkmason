@@ -9,6 +9,8 @@ function handleDirectory (dir)
         if isHidden (file) then
             local attributes = lfs.attributes (dir..'/'..file)
             if attributes.mode == "directory" then
+                local prefixDir = string.gsub (dir, inputDir, outputDir)
+                lfs.mkdir (prefixDir..'/'..file)
                 handleDirectory (dir..'/'..file)
             elseif attributes.mode == "file" then
                 handleFile (dir..'/'..file)
@@ -21,17 +23,18 @@ function handleFile (file)
     local splitFile = splitFilePath (file)
     splitFile[#splitFile] = splitFileName (splitFile[#splitFile])
 
-    for _, dirSegment in pairs(splitFile) do
-        if dirSegment == splitFile[#splitFile] then
-            for _, fileSegment in pairs(splitFile[#splitFile]) do
-                print(fileSegment)
-            end
-        else
-            print (dirSegment)
-        end
+    local baseFile = splitFile[#splitFile]
+
+    -- Convert Markdown files to HTML
+    if baseFile[#baseFile] == "md" then
+        baseFile[#baseFile] = "html"
+        local outputFile = '/'..joinFilePath (splitFile)
+        outputFile = string.gsub (outputFile, inputDir, outputDir)
+
+        os.execute ("pandoc -i "..file.." -o "..outputFile)
     end
 
-    print ()
+    print (file)
 end
 
 handleDirectory (inputDir)

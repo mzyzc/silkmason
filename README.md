@@ -8,4 +8,5 @@ A very simple static site generator based on pandoc
 
 ## Dependencies
 
-- LuaFileSystem (Copyright © 2003-2014 Kepler Project)
+- [LuaFileSystem](https://github.com/keplerproject/luafilesystem) (Copyright © 2003-2014 Kepler Project)
+- [pandoc](https://github.com/jgm/pandoc)
