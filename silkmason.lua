@@ -18,7 +18,20 @@ function handleDirectory (dir)
 end
 
 function handleFile (file)
-    print (file)
+    local splitFile = splitFilePath (file)
+    splitFile[#splitFile] = splitFileName (splitFile[#splitFile])
+
+    for _, dirSegment in pairs(splitFile) do
+        if dirSegment == splitFile[#splitFile] then
+            for _, fileSegment in pairs(splitFile[#splitFile]) do
+                print(fileSegment)
+            end
+        else
+            print (dirSegment)
+        end
+    end
+
+    print ()
 end
 
 handleDirectory (inputDir)
