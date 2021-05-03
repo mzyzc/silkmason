@@ -2,11 +2,12 @@
 
 require "lfs"
 require "lib/file"
+require "lib/misc"
 
 -- Settings
 config = require "config"
-if not config.inputDir then config.inputDir = arg[1] end
-if not config.outputDir then config.outputDir = arg[2] end
+if isEmpty(config.inputDir) then config.inputDir = arg[1] end
+if isEmpty(config.outputDir) then config.outputDir = arg[2] end
 
 -- Read through a directory
 function handleDirectory (dir)
