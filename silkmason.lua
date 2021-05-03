@@ -46,12 +46,12 @@ function handleFile (inputFile)
         extension = "html"
         file[#file] = extension
 
-        -- Modify path to match the output directory
-        local outputFile = joinFilePath (path)
-        outputFile = string.gsub (outputFile, config.inputDir, config.outputDir)
-
+        local outputFile = getOutputPath (path, config.inputDir, config.outputDir)
         os.execute ("pandoc -i "..inputFile.." -o "..outputFile)
         print (inputFile)
+    else
+        local outputFile = getOutputPath (path, config.inputDir, config.outputDir)
+        os.execute ("cp "..inputFile..' '..outputFile)
     end
 end
 

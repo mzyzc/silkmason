@@ -34,7 +34,6 @@ end
 function joinFilePath (filePath)
     -- Join the file and its extensions first
     filePath[#filePath] = joinFileName (filePath[#filePath])
-
     return '/'..joinString (filePath, '/')
 end
 
