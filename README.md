@@ -13,3 +13,4 @@ A very simple static site generator based on pandoc
 - `pathlib`
 - `sys`
 - `shutil`
+- `toml`
