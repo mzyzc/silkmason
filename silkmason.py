@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import toml
 from multiprocessing import Process
 from os import system
 from pathlib import Path
@@ -35,7 +36,11 @@ def handle_file(in_file, out_dir):
     print(out_file)
 
 
-in_dir = Path(argv[1])
-out_dir = Path(argv[2])
+# Load config
+config = toml.load('config.toml')
 
-handle_directory(in_dir, out_dir)
+# Set defaults
+config['input_dir'] = Path(argv[1] if len(argv) >= 2 else config['input_dir']).expanduser()
+config['output_dir'] = Path(argv[2] if len(argv) >= 3 else config['output_dir']).expanduser()
+
+handle_directory(config['input_dir'], config['output_dir'])
