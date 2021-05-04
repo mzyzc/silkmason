@@ -8,6 +8,7 @@ A very simple static site generator based on pandoc
 
 ## Dependencies
 
+- `multiprocessing`
 - `os`
 - `pathlib`
 - `sys`
