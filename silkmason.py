@@ -15,7 +15,7 @@ def handle_directory(in_dir, out_dir):
     for in_file in in_dir.iterdir():
         # Ignore hidden files
         if in_file.name[0] == '.':
-            return
+            continue
 
         if in_file.is_dir():
             # Create empty directory in the output location
