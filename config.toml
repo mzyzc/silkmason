@@ -1,2 +1,3 @@
 input_dir = ""
 output_dir = ""
+pandoc_args = "--standalone --to=html"

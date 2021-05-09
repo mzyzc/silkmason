@@ -10,7 +10,7 @@ from shutil import copy
 
 import toml
 
-def handle_directory(in_dir, out_dir):
+def handle_directory(in_dir, out_dir, config):
     """Explore a directory recursively to look for files"""
     for in_file in in_dir.iterdir():
         # Ignore hidden files
@@ -23,18 +23,19 @@ def handle_directory(in_dir, out_dir):
             out_file.mkdir(exist_ok=True)
 
             # Explore further directories recursively
-            process = Process(target=handle_directory, args=(in_file, out_file))
+            process = Process(target=handle_directory, args=(in_file, out_file, config))
             process.start()
         elif in_file.is_file():
-            handle_file(in_file, out_dir)
+            handle_file(in_file, out_dir, config)
 
-def handle_file(in_file, out_dir):
+def handle_file(in_file, out_dir, config):
     """Handle files based on their extension"""
     suffix = in_file.suffix.lower()
 
     if suffix == '.md':
         out_file = Path(out_dir, in_file.name).with_suffix('.html')
-        system(f'pandoc -i {in_file} -o {out_file}')
+        args = config['pandoc_args']
+        system(f'pandoc {args} -i {in_file} -o {out_file}')
     else:
         out_file = Path(out_dir, in_file.name)
         copy(in_file, out_file)
@@ -47,4 +48,4 @@ config = toml.load('config.toml')
 config['input_dir'] = Path(argv[1] if len(argv) >= 2 else config['input_dir']).expanduser()
 config['output_dir'] = Path(argv[2] if len(argv) >= 3 else config['output_dir']).expanduser()
 
-handle_directory(config['input_dir'], config['output_dir'])
+handle_directory(config['input_dir'], config['output_dir'], config)
