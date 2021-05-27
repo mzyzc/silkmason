@@ -7,47 +7,17 @@ from pathlib import Path
 import lxml
 import toml
 
-def generate_entry(entry_file):
-    """Extract Atom entry data from a HTML file"""
-    data = {}
-    with open(entry, 'r') as entry_file:
-        soup = BeautifulSoup(entry_file, 'html.parser')
-        data['id'] = f'https://{domain}/{entry.relative_to(root)}'
-        data['title'] = soup.find('h1').string
-        data['link'] = f'https://{domain}/{entry.relative_to(root)}'
-        data['summary'] = soup.main.p
-    return data
-
 def add_tag(node, label, data, attributes):
     """Create a new tag and append it to a node"""
-    tag = node.new_tag(label)
-    tag.string = data
+    tag = soup.new_tag(label)
+
+    if data:
+        tag.string = data
+
     for attr in attributes.keys():
         tag[attr] = attributes[attr]
+
     node.append(tag)
-
-def convert_to_feed(data):
-    """Convert a dictionary into an Atom feed"""
-    soup = BeautifulSoup(features='xml')
-
-    add_tag(soup, 'feed', None, {'xmlns': 'http://www.w3.org/2005/Atom'})
-    add_tag(soup.feed, 'id', data['id'], None)
-    add_tag(soup.feed, 'title', data['title'], None)
-    add_tag(soup.feed, 'author', data['author'], None)
-    add_tag(soup.feed, 'link', None, {'href': data['link']})
-
-    for entry in data['entries']:
-        subsoup = soup.new_tag('entry')
-
-        add_tag(subsoup, 'id', entry['id'], None)
-        add_tag(subsoup, 'title', entry['title'], None)
-        add_tag(subsoup, 'link', None, {'href': entry['link']})
-        # TODO: figure out why this doesn't work
-        #add_tag(subsoup, 'summary', entry['summary'], {'type': 'html'})
-
-        soup.feed.append(subsoup)
-
-    return soup
 
 
 config = toml.load('config.toml')
@@ -56,13 +26,14 @@ author = config['feedmason']['author']
 root = Path(config['feedmason']['root']).expanduser()
 feeds = [Path(feed) for feed in config['feedmason']['feeds']]
 
-output_feed = {
-    'id': f'https://{domain}',
-    'title': domain,
-    'author': author,
-    'link': f'https://{domain}/feed',
-    'entries': [],
-}
+soup = BeautifulSoup(features='xml')
+
+# node, label, data, attributes
+add_tag(soup, 'feed', '', {'xmlns': 'http://www.w3.org/2005/Atom'})
+add_tag(soup.feed, 'id', f'https://{domain}', {})
+add_tag(soup.feed, 'title', domain, {})
+add_tag(soup.feed, 'author', author, {})
+add_tag(soup.feed, 'link', '', {'href': f'https://{domain}/feed'})
 
 for feed in feeds:
     # Get absolute path
@@ -71,8 +42,15 @@ for feed in feeds:
         if not entry.is_file():
             continue
 
-        data = generate_entry(entry)
-        output_feed['entries'].append(data)
+        with open(entry, 'r') as entry_file:
+            html = BeautifulSoup(entry_file, 'html.parser')
+            title = html.find('h1').string
+            summary = html.main.p
 
-final = convert_to_feed(output_feed)
-print(final)
+            node = soup.new_tag('entry')
+            add_tag(node, 'id', f'https://{domain}/{entry.relative_to(root)}', {})
+            add_tag(node, 'title', title, {})
+            add_tag(node, 'link', '', {'href': f'https://{domain}/{entry.relative_to(root)}'})
+        soup.feed.append(node)
+
+print(soup)
