@@ -18,46 +18,32 @@ def generate_entry(entry_file):
         data['summary'] = soup.main.p
     return data
 
+def add_tag(node, label, data, attributes):
+    """Create a new tag and append it to a node"""
+    tag = node.new_tag(label)
+    tag.string = data
+    for attr in attributes.keys():
+        tag[attr] = attributes[attr]
+    node.append(tag)
+
 def convert_to_feed(data):
     """Convert a dictionary into an Atom feed"""
     soup = BeautifulSoup(features='xml')
 
-    tag = soup.new_tag('feed', xmlns='http://www.w3.org/2005/Atom')
-    soup.append(tag)
-
-    tag = soup.new_tag('id')
-    tag.string = data['id']
-    soup.feed.append(tag)
-
-    tag = soup.new_tag('title')
-    tag.string = data['title']
-    soup.feed.append(tag)
-
-    tag = soup.new_tag('author')
-    tag.string = data['author']
-    soup.feed.append(tag)
-
-    tag = soup.new_tag('link', href=data['link'])
-    soup.feed.append(tag)
+    add_tag(soup, 'feed', None, {'xmlns': 'http://www.w3.org/2005/Atom'})
+    add_tag(soup.feed, 'id', data['id'], None)
+    add_tag(soup.feed, 'title', data['title'], None)
+    add_tag(soup.feed, 'author', data['author'], None)
+    add_tag(soup.feed, 'link', None, {'href': data['link']})
 
     for entry in data['entries']:
         subsoup = soup.new_tag('entry')
 
-        tag = soup.new_tag('id')
-        tag.string = entry['id']
-        subsoup.append(tag)
-
-        tag = soup.new_tag('title')
-        tag.string = entry['title']
-        subsoup.append(tag)
-
-        tag = soup.new_tag('link', href=entry['link'])
-        subsoup.append(tag)
-
+        add_tag(subsoup, 'id', entry['id'], None)
+        add_tag(subsoup, 'title', entry['title'], None)
+        add_tag(subsoup, 'link', None, {'href': entry['link']})
         # TODO: figure out why this doesn't work
-        #tag = soup.new_tag('summary', type='html')
-        #tag.string = entry['summary']
-        #subsoup.append(tag)
+        #add_tag(subsoup, 'summary', entry['summary'], {'type': 'html'})
 
         soup.feed.append(subsoup)
 
