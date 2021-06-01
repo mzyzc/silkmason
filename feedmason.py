@@ -53,7 +53,7 @@ def create_feed(path, root, domain, author):
     add_tag(soup.feed, 'id', domain/path, {})
     add_tag(soup.feed, 'title', title, {})
     add_tag(soup.feed, 'author', author, {})
-    add_tag(soup.feed, 'link', '', {'href': f'https://{domain}/feed.xml'})
+    add_tag(soup.feed, 'link', '', {'href': f'https://{domain/path}/feed.xml'})
 
     for entry_file in (root/path).iterdir():
         entry = create_entry(entry_file.relative_to(root), root, domain)
@@ -62,10 +62,23 @@ def create_feed(path, root, domain, author):
 
     return soup
 
-def combine_feeds(feeds, domain):
+def combine_feeds(paths, root, domain, author):
     """Combine multiple Atom feeds into one"""
-    # TODO
-    pass
+    soup = BeautifulSoup(features='xml')
+
+    add_tag(soup, 'feed', '', {'xmlns': 'http://www.w3.org/2005/Atom'})
+    add_tag(soup.feed, 'id', domain, {})
+    add_tag(soup.feed, 'title', domain, {})
+    add_tag(soup.feed, 'author', author, {})
+    add_tag(soup.feed, 'link', '', {'href': f'https://{domain}/feed.xml'})
+
+    for path in paths:
+        with open(root/path/'feed.xml', 'r') as feed:
+            xml = BeautifulSoup(feed.read(), 'lxml')
+            for entry in xml.find_all('entry'):
+                soup.feed.append(entry)
+
+    return soup
 
 
 # Load configuration file
@@ -76,7 +89,10 @@ root = Path(config['feedmason']['root']).expanduser()
 feeds = [Path(feed) for feed in config['feedmason']['feeds']]
 
 for feed_path in feeds:
-    feed = create_feed(feed_path, root, domain, author)
-
     with open(root/feed_path/'feed.xml', 'w') as feed_file:
+        feed = create_feed(feed_path, root, domain, author)
         feed_file.write(str(feed))
+
+with open(root/'feed.xml', 'w') as feed_file:
+    feed = combine_feeds(feeds, root, domain, author)
+    feed_file.write(str(feed))
