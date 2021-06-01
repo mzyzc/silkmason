@@ -25,7 +25,7 @@ def create_entry(path, root, domain):
     soup = BeautifulSoup(features='xml')
     entry = root / path
 
-    if not entry.is_file():
+    if (not entry.is_file()) or entry.name == 'feed.xml':
         return
 
     with open(entry, 'r') as entry_file:
@@ -53,7 +53,7 @@ def create_feed(path, root, domain, author):
     add_tag(soup.feed, 'id', domain/path, {})
     add_tag(soup.feed, 'title', title, {})
     add_tag(soup.feed, 'author', author, {})
-    add_tag(soup.feed, 'link', '', {'href': f'https://{domain}/feed'})
+    add_tag(soup.feed, 'link', '', {'href': f'https://{domain}/feed.xml'})
 
     for entry_file in (root/path).iterdir():
         entry = create_entry(entry_file.relative_to(root), root, domain)
@@ -77,4 +77,6 @@ feeds = [Path(feed) for feed in config['feedmason']['feeds']]
 
 for feed_path in feeds:
     feed = create_feed(feed_path, root, domain, author)
-    print(feed, end='\n\n')
+
+    with open(root/feed_path/'feed.xml', 'w') as feed_file:
+        feed_file.write(str(feed))
