@@ -10,7 +10,7 @@ Pandoc arguments can be provided via the `pandoc_args` option in the configurati
 
 ### FeedMason
 
-FeedMason is an auxiliary project that generates Atom feeds for an already-generated website. It requires a configuration file with the following options:
+FeedMason is an auxiliary script that generates Atom feeds for an existing website. It requires a configuration file with the following options set:
 
 - `domain` (domain of the website)
 - `author` (author of the website)
@@ -20,4 +20,5 @@ FeedMason is an auxiliary project that generates Atom feeds for an already-gener
 ## Dependencies
 
 - `toml`
+- `lxml` (FeedMason)
 - `bs4` (FeedMason)
