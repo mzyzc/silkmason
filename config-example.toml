@@ -1,6 +1,6 @@
 input_dir = ""
 output_dir = ""
-pandoc_args = "--standalone --to=html"
+pandoc_args = "--standalone --to=html --lua-filter ./filters/set_title.lua --lua-filter ./filters/set_description.lua --lua-filter ./filters/format_date.lua"
 
 [feedmason]
 domain = ""
