@@ -45,7 +45,7 @@ def create_feed(path, root, domain, author):
     """Create an Atom feed"""
     soup = BeautifulSoup(features='xml')
 
-    with open(f'{root/path}.html', 'r') as page_file:
+    with open(f'{root/path}/index.html', 'r') as page_file:
         html = BeautifulSoup(page_file, 'html.parser')
         title = html.title.string
 
