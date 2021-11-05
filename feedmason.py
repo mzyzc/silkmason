@@ -56,6 +56,9 @@ def create_feed(path, root, domain, author):
     add_tag(soup.feed, 'link', '', {'href': f'https://{domain/path}/feed.xml'})
 
     for entry_file in (root/path).iterdir():
+        if entry_file.name == 'index.html':
+            continue
+
         entry = create_entry(entry_file.relative_to(root), root, domain)
         if entry:
             soup.feed.append(entry)
