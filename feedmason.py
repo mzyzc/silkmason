@@ -102,10 +102,9 @@ def add_link(root, path):
     heading = html.h1
     heading.insert(1, link)
 
-    ttt = str(html)
-
     with open(index_path, 'w') as index_file:
-        index_file.write(ttt)
+        html = str(html)
+        index_file.write(html)
 
 
 # Load configuration file
