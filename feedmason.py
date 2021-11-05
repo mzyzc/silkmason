@@ -83,6 +83,24 @@ def combine_feeds(paths, root, domain, author):
 
     return soup
 
+def add_link(root, path):
+    index_path = root/path/'index.html'
+
+    with open(index_path, 'r') as index_file:
+        html = BeautifulSoup(index_file, 'lxml')
+
+    link = html.new_tag('a', href='feed.xml')
+    link_image = html.new_tag('img', src='/assets/feed.svg', alt='Web feed')
+    link.insert(0, link_image)
+
+    heading = html.h1
+    heading.insert(1, link)
+
+    ttt = str(html)
+
+    with open(index_path, 'w') as index_file:
+        index_file.write(ttt)
+
 
 # Load configuration file
 config = toml.load('config.toml')
@@ -95,6 +113,7 @@ for feed_path in feeds:
     with open(root/feed_path/'feed.xml', 'w') as feed_file:
         feed = create_feed(feed_path, root, domain, author)
         feed_file.write(str(feed))
+    add_link(root, feed_path)
 
 with open(root/'feed.xml', 'w') as feed_file:
     feed = combine_feeds(feeds, root, domain, author)
