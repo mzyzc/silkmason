@@ -31,7 +31,7 @@ def create_entry(path, root, domain):
     with open(entry, 'r') as entry_file:
         html = BeautifulSoup(entry_file, 'html.parser')
         title = html.find('h1').string
-        summary = html.find('p')
+        summary = html.find('main').find('p')
 
         published_date = html.find('meta', attrs={'name': 'dcterms.date'})
 
