@@ -31,13 +31,19 @@ def create_entry(path, root, domain):
     with open(entry, 'r') as entry_file:
         html = BeautifulSoup(entry_file, 'html.parser')
         title = html.find('h1').string
-        summary = html.main.p
+        summary = html.find('p')
+
+        published_date = html.find('meta', attrs={'name': 'dcterms.date'})
 
     node = soup.new_tag('entry')
     add_tag(node, 'id', domain/path, {})
     add_tag(node, 'title', title, {})
     add_tag(node, 'link', '', {'href': f'https://{domain/path}'})
-    #add_tag(node, 'summary', summary, {})
+
+    if summary:
+        add_tag(node, 'summary', summary.text, {})
+    if published_date:
+        add_tag(node, 'published', published_date['content'], {})
 
     return node
 
