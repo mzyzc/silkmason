@@ -43,7 +43,7 @@ def create_entry(path, root, domain):
     if summary:
         add_tag(node, 'summary', summary.text, {})
     if published_date:
-        add_tag(node, 'published', published_date['content'], {})
+        add_tag(node, 'published', published_date['content'] + 'T00:00:00Z', {})
 
     return node
 
