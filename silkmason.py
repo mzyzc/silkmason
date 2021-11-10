@@ -2,8 +2,8 @@
 
 """Converts a collection of files into a static website"""
 
+import os
 from multiprocessing import Process
-from os import system
 from pathlib import Path
 from sys import argv
 from shutil import copy
@@ -35,12 +35,36 @@ def handle_file(in_file, out_dir, config):
     if suffix == '.md':
         out_file = Path(out_dir, in_file.name).with_suffix('.html')
         args = config['pandoc_args']
-        system(f'pandoc {args} -i {in_file} -o {out_file}')
+        os.system(f'pandoc {args} -i {in_file} -o {out_file}')
+    elif suffix == '.html':
+        out_file = Path(out_dir, in_file.name).with_suffix('.html')
+        args = config['pandoc_args']
+        os.system(f'pandoc {args} -i {in_file} -o {out_file}')
+
+        os.system(f'pandoc -i {in_file} -o temp.html')
+        replace_file_contents(out_file, 'temp.html', in_file)
+        os.remove('temp.html')
     else:
         out_file = Path(out_dir, in_file.name)
         copy(in_file, out_file)
 
     print(out_file)
+
+def replace_file_contents(target_path, from_path, to_path):
+    """Replaces contents of 'from' file with contents of 'to' file inside 'target' file."""
+    with open(target_path, 'r+') as target_file:
+        target_text = target_file.read()
+
+        with open(from_path, 'r') as from_file:
+            from_text = from_file.read()
+
+        with open(to_path, 'r') as to_file:
+            to_text = to_file.read()
+
+        target_file.seek(0)
+        target_text = target_text.replace(from_text, to_text)
+        target_file.write(target_text)
+        target_file.truncate()
 
 
 # Load config and override some settings with command-line arguments
