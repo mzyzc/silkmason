@@ -3,6 +3,7 @@
 """Converts a collection of files into a static website"""
 
 import os
+import subprocess
 from multiprocessing import Process
 from pathlib import Path
 from sys import argv
@@ -34,14 +35,14 @@ def handle_file(in_file, out_dir, config):
 
     if suffix == '.md':
         out_file = Path(out_dir, in_file.name).with_suffix('.html')
-        args = config['pandoc_args']
-        os.system(f'pandoc {args} -i {in_file} -o {out_file}')
+        args = config['pandoc_args'].split(' ')
+        subprocess.run(['pandoc', *args, '-i', in_file, '-o', out_file])
     elif suffix == '.html':
         out_file = Path(out_dir, in_file.name).with_suffix('.html')
-        args = config['pandoc_args']
-        os.system(f'pandoc {args} -i {in_file} -o {out_file}')
+        args = config['pandoc_args'].split(' ')
+        subprocess.run(['pandoc', *args, '-i', in_file, '-o', out_file])
 
-        os.system(f'pandoc -i {in_file} -o temp.html')
+        subprocess.run(['pandoc', '-i', in_file, '-o', 'temp.html'])
         replace_file_contents(out_file, 'temp.html', in_file)
         os.remove('temp.html')
     else:
