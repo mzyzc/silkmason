@@ -35,13 +35,13 @@ async def handle_file(in_file, out_dir, config):
     if suffix == '.md':
         out_file = Path(out_dir, in_file.name).with_suffix('.html')
         args = config['pandoc_args'].split(' ')
-        subprocess.run(['pandoc', *args, '-i', in_file, '-o', out_file])
+        subprocess.Popen(['pandoc', *args, '-i', in_file, '-o', out_file])
     elif suffix == '.html':
         out_file = Path(out_dir, in_file.name).with_suffix('.html')
         args = config['pandoc_args'].split(' ')
-        subprocess.run(['pandoc', *args, '-i', in_file, '-o', out_file])
+        subprocess.Popen(['pandoc', *args, '-i', in_file, '-o', out_file])
 
-        subprocess.run(['pandoc', '-i', in_file, '-o', 'temp.html'])
+        subprocess.Popen(['pandoc', '-i', in_file, '-o', 'temp.html'])
         replace_file_contents(out_file, 'temp.html', in_file)
         os.remove('temp.html')
     else:
