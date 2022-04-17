@@ -4,14 +4,14 @@
 
 import os
 import subprocess
-from multiprocessing import Process
+import asyncio
 from pathlib import Path
 from sys import argv
 from shutil import copy
 
 import toml
 
-def handle_directory(in_dir, out_dir, config):
+async def handle_directory(in_dir, out_dir, config):
     """Explore a directory recursively to look for files"""
     for in_file in in_dir.iterdir():
         # Ignore hidden files
@@ -24,12 +24,11 @@ def handle_directory(in_dir, out_dir, config):
             out_file.mkdir(exist_ok=True)
 
             # Explore further directories recursively
-            process = Process(target=handle_directory, args=(in_file, out_file, config))
-            process.start()
+            await handle_directory(in_file, out_file, config)
         elif in_file.is_file():
-            handle_file(in_file, out_dir, config)
+            await handle_file(in_file, out_dir, config)
 
-def handle_file(in_file, out_dir, config):
+async def handle_file(in_file, out_dir, config):
     """Handle files based on their extension"""
     suffix = in_file.suffix.lower()
 
@@ -73,4 +72,4 @@ config = toml.load('config.toml')
 config['input_dir'] = Path(argv[1] if len(argv) >= 2 else config['input_dir']).expanduser()
 config['output_dir'] = Path(argv[2] if len(argv) >= 3 else config['output_dir']).expanduser()
 
-handle_directory(config['input_dir'], config['output_dir'], config)
+asyncio.run(handle_directory(config['input_dir'], config['output_dir'], config))
