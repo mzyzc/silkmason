@@ -41,7 +41,7 @@ async def handle_file(in_file, out_dir, config):
         args = config['pandoc_args'].split(' ')
         subprocess.Popen(['pandoc', *args, '-i', in_file, '-o', out_file])
 
-        subprocess.Popen(['pandoc', '-i', in_file, '-o', 'temp.html'])
+        subprocess.call(['pandoc', '-i', in_file, '-o', 'temp.html'])
         replace_file_contents(out_file, 'temp.html', in_file)
         os.remove('temp.html')
     else:
