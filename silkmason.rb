@@ -22,22 +22,18 @@ def handle_file(in_file, out_dir, config)
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
-    puts out_file
-
     args = config["pandoc_args"].split " "
     IO.popen(["pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s])
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
-    puts out_file
-
     args = config["pandoc_args"].split " "
     IO.popen(["pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s])
   else
     out_file = Pathname.new out_dir + in_file.basename
-    puts out_file
-
     FileUtils.cp in_file, out_file
   end
+
+    puts out_file
 end
 
 def replace_file_contents(target_path, from_path, to_path)
