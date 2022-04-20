@@ -32,10 +32,6 @@ def handle_file(in_file, out_dir, config)
 
     args = config["pandoc_args"].split " "
     IO.popen(["pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s])
-
-    #`pandoc -i in_file -o temp.html`
-    #replace_file_contents out_file, Pathname.new("temp.html"), in_file
-    #File.delete "temp.html"
   else
     out_file = Pathname.new out_dir + in_file.basename
     puts out_file
