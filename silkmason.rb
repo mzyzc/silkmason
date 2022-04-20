@@ -25,15 +25,13 @@ def handle_file(in_file, out_dir, config)
     puts out_file
 
     args = config["pandoc_args"].split " "
-    puts out_file
-    fork do exec("pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s) end
+    IO.popen(["pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s])
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
     puts out_file
 
     args = config["pandoc_args"].split " "
-    puts out_file
-    fork do exec("pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s) end
+    IO.popen(["pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s])
 
     #`pandoc -i in_file -o temp.html`
     #replace_file_contents out_file, Pathname.new("temp.html"), in_file
