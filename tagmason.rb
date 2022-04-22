@@ -3,6 +3,7 @@
 require "nokogiri"
 require "toml"
 require "pathname"
+require "fileutils"
 
 def handle_directory(dir, root)
   dir.each_child do |file|
@@ -39,7 +40,7 @@ def handle_file(file, root)
       tags << node
 
       tags_file = (root + (Pathname.new "tags") + (Pathname.new keyword)).sub_ext ".html"
-      content = "<a href='/#{file.relative_path_from root}'>#{file.basename}</a>"
+      content = "<a href='/#{file.relative_path_from root}'>#{file.basename}</a><br>"
       tags_file.write content, mode: "a"
     end
 
@@ -50,6 +51,7 @@ config = TOML.load_file "config.toml"
 root = (Pathname.new config["tagmason"]["root"]).expand_path
 
 tags_dir = root + (Pathname.new "tags")
-Dir.mkdir tags_dir unless tags_dir.exist?
+FileUtils.rm_rf tags_dir unless not tags_dir.exist?
+Dir.mkdir tags_dir
 
 handle_directory root, root
