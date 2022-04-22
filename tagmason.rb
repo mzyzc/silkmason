@@ -18,23 +18,23 @@ def handle_directory(dir, root)
 end
 
 def handle_file(file, root)
-    return if file.extname != ".html"
-    html = File.open file, "r" do |f| Nokogiri::HTML f end
+  return if file.extname != ".html"
+  html = File.open file, "r" do |f| Nokogiri::HTML f end
 
-    tags = html.at "#tags"
-    return if not tags
+  tags = html.at "#tags"
+  return if not tags
 
-    keywords = (html.at "meta[name='keywords']")["content"].split ", "
+  keywords = (html.at "meta[name='keywords']")["content"].split ", "
 
-    keywords.each do |keyword|
-      node = create_tag keyword
-      tags << node
+  keywords.each do |keyword|
+    node = create_tag keyword
+    tags << node
 
-      tags_file = (root + (Pathname.new "tags") + (Pathname.new keyword)).sub_ext ".html"
-      link_page tags_file, (file.relative_path_from root)
-    end
+    tags_file = (root + (Pathname.new "tags") + (Pathname.new keyword)).sub_ext ".html"
+    link_page tags_file, (file.relative_path_from root)
+  end
 
-    file.write html.to_xml
+  file.write html.to_xml
 end
 
 def create_tag(tag)
