@@ -19,10 +19,11 @@ def handle_directory(in_dir, out_dir, config)
 end
 
 def handle_file(in_file, out_dir, config)
+  args = config["pandoc_args"].split " "
+
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
-    args = config["pandoc_args"].split " "
     IO.popen([
       "pandoc", *args,
       "-i", in_file.to_s,
@@ -30,7 +31,6 @@ def handle_file(in_file, out_dir, config)
     ])
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
-    args = config["pandoc_args"].split " "
     IO.popen([
       "pandoc", *args,
       "-f", "html+raw_html",
