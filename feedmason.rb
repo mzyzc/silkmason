@@ -10,7 +10,7 @@ def create_entry(path, root, domain)
   exceptions = ["index.html"]
   return if (not entry_path.file?) or (entry_path.extname != ".html") or (exceptions.include? entry_path.basename.to_s)
   
-  html = File.open entry_path, "r" do |f| Nokogiri::HTML f end
+  html = File.open entry_path do |f| Nokogiri::HTML f end
   title = (html.at "h1").content rescue nil
   summary = (html.at "main").at "p" rescue nil
   pub_date = html.at "meta[name='dcterms.date']" rescue nil
@@ -20,7 +20,7 @@ def create_entry(path, root, domain)
     entry {
       id_ (Pathname.new domain) + path
       title title
-      link("href" => "https://#{domain}/#{path}")
+      link(:href => "https://#{domain}/#{path}")
       summary summary.content if summary
       published pub_date["content"] if pub_date
     }
@@ -30,15 +30,15 @@ def create_entry(path, root, domain)
 end
 
 def create_feed(path, root, domain, author)
-  html = File.open (root + path + "index.html"), "r" do |f| Nokogiri::HTML f end
+  html = File.open (root + path + "index.html") do |f| Nokogiri::HTML f end
   title = (html.at "title").content
   
   doc = Nokogiri::XML::Builder.new(:encoding => "utf-8") do
-    feed("xmlns" => "http://www.w3.org/2005/Atom") {
+    feed(:xmlns => "http://www.w3.org/2005/Atom") {
       id_ ((Pathname.new domain) + path)
       title title
       author author
-      link("href" => "https://#{domain}/#{path}/feed.xml")
+      link(:href => "https://#{domain}/#{path}/feed.xml")
     }
   end
   doc = Nokogiri::XML doc.to_xml
@@ -56,18 +56,18 @@ end
 
 def combine_feeds(paths, root, domain, author)
   doc = Nokogiri::XML::Builder.new(:encoding => "utf-8") do
-    feed("xmlns" => "http://www.w3.org/2005/Atom") {
+    feed(:xmlns => "http://www.w3.org/2005/Atom") {
       id_ domain
       title domain
       author author
-      link("href" => "https://#{domain}/feed.xml")
+      link(:href => "https://#{domain}/feed.xml")
     }
   end
   doc = Nokogiri::XML doc.to_xml
   
   feed = doc.at "feed"
   paths.each do |path|
-    feeds = File.open (root + path + "feed.xml"), "r" do |f| Nokogiri::XML f end
+    feeds = File.open (root + path + "feed.xml") do |f| Nokogiri::XML f end
     (feeds.search "entry").each do |entry|
       feed << entry
     end if feeds.at "entry"

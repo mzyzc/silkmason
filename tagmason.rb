@@ -19,7 +19,7 @@ end
 
 def handle_file(file, root)
   return if file.extname != ".html"
-  html = File.open file, "r" do |f| Nokogiri::HTML f end
+  html = File.open file do |f| Nokogiri::HTML f end
 
   tags = html.at "#tags"
   return if not tags
