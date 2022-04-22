@@ -26,7 +26,7 @@ def create_entry(path, root, domain)
     }
   end
   
-  return Nokogiri::XML.fragment node.to_xml
+  Nokogiri::XML.fragment node.to_xml
 end
 
 def create_feed(path, root, domain, author)
@@ -51,7 +51,7 @@ def create_feed(path, root, domain, author)
     (feed << entry) if entry
   end
   
-  return doc
+  doc
 end
 
 def combine_feeds(paths, root, domain, author)
@@ -73,7 +73,7 @@ def combine_feeds(paths, root, domain, author)
     end if feeds.at "entry"
   end
   
-  return doc
+  doc
 end
 
 config = TOML.load_file "config.toml"
