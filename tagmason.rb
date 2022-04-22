@@ -51,8 +51,16 @@ def create_tag(tag)
 end
 
 def link_page(tags_file, page_file)
-  content = "<a href='/#{page_file}'>#{page_file.basename}</a><br>"
-  tags_file.write content, mode: "a"
+  node = Nokogiri::HTML.fragment ""
+  Nokogiri::HTML::Builder.with(node) do
+    a(:href => "/#{page_file}") {
+      text page_file.basename
+    }
+    br
+  end
+  node = Nokogiri::HTML.fragment node.to_xml
+
+  tags_file.write node, mode: "a"
 end
 
 config = TOML.load_file "config.toml"
