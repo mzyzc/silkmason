@@ -7,13 +7,13 @@ require "pathname"
 def create_entry(path, root, domain)
   entry_path = root + path
   
-  exceptions = ["index.html", "feed.xml"]
-  return if (not entry_path.file?) or (exceptions.include? entry_path.basename.to_s)
+  exceptions = ["index.html"]
+  return if (not entry_path.file?) or (entry_path.extname != ".html") or (exceptions.include? entry_path.basename.to_s)
   
   html = File.open entry_path, "r" do |f| Nokogiri::HTML f end
-  title = (html.at "h1").content
-  summary = (html.at "main").at "p"
-  pub_date = html.at "meta[name='dcterms.date']"
+  title = (html.at "h1").content rescue nil
+  summary = (html.at "main").at "p" rescue nil
+  pub_date = html.at "meta[name='dcterms.date']" rescue nil
   
   node = Nokogiri::XML.fragment ""
   Nokogiri::XML::Builder.with(node) do
