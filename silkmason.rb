@@ -36,17 +36,6 @@ def handle_file(in_file, out_dir, config)
     puts out_file
 end
 
-def replace_file_contents(target_path, from_path, to_path)
-  target_text = target_path.read
-
-  from_text = File.read from_path
-  to_text = File.read to_path
-
-  target_text = target_file.read target_path
-  target_text = target_text.gsub! from_text, to_text
-  File.open(target_path, "w") do |f| f.puts(target_text) end
-end
-
 config = TOML.load_file "config.toml"
 config["input_dir"] = Pathname.new(if ARGV.length >= 2 then ARGV[1] else config["input_dir"] end).expand_path
 config["output_dir"] = Pathname.new(if ARGV.length >= 3 then ARGV[2] else config["output_dir"] end).expand_path
