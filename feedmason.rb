@@ -9,7 +9,7 @@ def create_entry(path, root, domain)
   
   return if (not entry_path.file?) or (entry_path.basename == "feed.xml")
   
-  html = Nokogiri::HTML (File.open entry_path)
+  html = File.open entry_path, "r" do |f| Nokogiri::HTML f end
   title = (html.at "h1").content
   summary = (html.at "main").at "p"
   pub_date = html.at "meta[name='dcterms.date']"
@@ -29,7 +29,7 @@ def create_entry(path, root, domain)
 end
 
 def create_feed(path, root, domain, author)
-  html = Nokogiri::HTML File.open (root + path + "index.html")
+  html = File.open (root + path + "index.html"), "r" do |f| Nokogiri::HTML f end
   title = (html.at "title").content
   
   doc = Nokogiri::XML::Builder.new(:encoding => "utf-8") do
@@ -66,7 +66,7 @@ def combine_feeds(paths, root, domain, author)
   
   feed = doc.at "feed"
   paths.each do |path|
-    feeds = Nokogiri::XML File.open (root + path + "feed.xml")
+    feeds = File.open (root + path + "feed.xml"), "r" do |f| Nokogiri::XML f end
     (feeds.search "entry").each do |entry|
       feed << entry
     end if feeds.at "entry"
