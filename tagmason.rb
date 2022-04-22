@@ -27,24 +27,32 @@ def handle_file(file, root)
     keywords = (html.at "meta[name='keywords']")["content"].split ", "
 
     keywords.each do |keyword|
-      node = Nokogiri::HTML.fragment ""
-      Nokogiri::HTML::Builder.with(node) do
-        li {
-          a(:href => "/tags/#{keyword}.html") {
-            text keyword
-          }
-        }
-      end
-      node = Nokogiri::HTML.fragment node.to_xml
-
+      node = create_tag keyword
       tags << node
 
       tags_file = (root + (Pathname.new "tags") + (Pathname.new keyword)).sub_ext ".html"
-      content = "<a href='/#{file.relative_path_from root}'>#{file.basename}</a><br>"
-      tags_file.write content, mode: "a"
+      link_page tags_file, (file.relative_path_from root)
     end
 
     file.write html.to_xml
+end
+
+def create_tag(tag)
+  node = Nokogiri::HTML.fragment ""
+  Nokogiri::HTML::Builder.with(node) do
+    li {
+      a(:href => "/tags/#{tag}.html") {
+        text tag
+      }
+    }
+  end
+
+  Nokogiri::HTML.fragment node.to_xml
+end
+
+def link_page(tags_file, page_file)
+  content = "<a href='/#{page_file}'>#{page_file.basename}</a><br>"
+  tags_file.write content, mode: "a"
 end
 
 config = TOML.load_file "config.toml"
