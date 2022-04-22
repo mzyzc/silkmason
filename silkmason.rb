@@ -23,11 +23,21 @@ def handle_file(in_file, out_dir, config)
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
     args = config["pandoc_args"].split " "
-    IO.popen(["pandoc", *args, "-i", in_file.to_s, "-o", out_file.to_s])
+    IO.popen([
+      "pandoc", *args,
+      "-i", in_file.to_s,
+      "-o", out_file.to_s,
+    ])
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
     args = config["pandoc_args"].split " "
-    IO.popen(["pandoc", *args, "-f", "html+raw_html", "-t", "html+raw_html", "-i", in_file.to_s, "-o", out_file.to_s])
+    IO.popen([
+      "pandoc", *args,
+      "-f", "html+raw_html",
+      "-t", "html+raw_html",
+      "-i", in_file.to_s,
+      "-o", out_file.to_s,
+    ])
   else
     out_file = Pathname.new out_dir + in_file.basename
     FileUtils.cp in_file, out_file
