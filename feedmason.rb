@@ -7,7 +7,8 @@ require "pathname"
 def create_entry(path, root, domain)
   entry_path = root + path
   
-  return if (not entry_path.file?) or (entry_path.basename == "feed.xml")
+  exceptions = ["index.html", "feed.xml"]
+  return if (not entry_path.file?) or (exceptions.include? entry_path.basename.to_s)
   
   html = File.open entry_path, "r" do |f| Nokogiri::HTML f end
   title = (html.at "h1").content
@@ -47,7 +48,7 @@ def create_feed(path, root, domain, author)
     next if (entry_file.extname != ".html") or (entry_file.basename == "index.html")
     
     entry = create_entry (entry_file.relative_path_from root), root, domain
-    feed << entry
+    (feed << entry) if entry
   end
   
   return doc
