@@ -27,10 +27,14 @@ Source and destination directories can be overridden with command-line arguments
 - `filters` `array:string`: Lua pandoc filters to run when generating pages
 - `pandoc_args` `array:string`: arguments to use when calling pandoc
 
+---
+
 - `feedmason.domain` `string`: the domain used to identify the website
 - `feedmason.author` `string`: the owner of the website
 - `feedmason.root` `string`: the directory where the website is located (usually the same as `output_dir`)
 - `feedmason.feeds` `array:string`: directories, relative to `feedmason.root`, for which feeds should be generated
+
+---
 
 - `tagmason.root` `string`: the directory where the website is located (usually the same as `output_dir`)
 
