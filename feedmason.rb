@@ -4,6 +4,7 @@ require "nokogiri"
 require "toml"
 require "pathname"
 
+# Create XML node representing an Atom entry
 def create_entry(path, root, domain)
   entry_path = root + path
   
@@ -31,6 +32,7 @@ def create_entry(path, root, domain)
   Nokogiri::XML.fragment node.to_xml
 end
 
+# Create Atom feed for a directory of files
 def create_feed(path, root, domain, author)
   html = (root + path + "index.html").open do |f| Nokogiri::HTML f end
   title = (html.at "title")
@@ -56,6 +58,7 @@ def create_feed(path, root, domain, author)
   doc
 end
 
+# Combine multiple Atom feeds into one
 def combine_feeds(paths, root, domain, author)
   doc = Nokogiri::XML::Builder.new(:encoding => "utf-8") do
     feed(:xmlns => "http://www.w3.org/2005/Atom") {

@@ -4,9 +4,12 @@ require "fileutils"
 require "toml"
 require "pathname"
 
+def hidden?(file) file.basename.to_path.start_with? "." end
+
+# Recursively explore directory looking for files
 def handle_directory(in_dir, out_dir, config)
   in_dir.each_child do |in_file|
-    next if in_file.basename.to_path.start_with? "."
+    next if in_file.hidden?
 
     if in_file.directory?
       out_file = Pathname.new out_dir + in_file.basename
@@ -18,6 +21,7 @@ def handle_directory(in_dir, out_dir, config)
   end
 end
 
+# Convert a file to an appropriate format based on extension
 def handle_file(in_file, out_dir, config)
   case in_file.extname
   when ".md"

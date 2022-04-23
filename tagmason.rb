@@ -5,6 +5,7 @@ require "toml"
 require "pathname"
 require "fileutils"
 
+# Recursively explore directory looking for files
 def handle_directory(dir, root)
   dir.each_child do |file|
     next if file.basename.to_path.start_with? "."
@@ -17,6 +18,7 @@ def handle_directory(dir, root)
   end
 end
 
+# Add tags to a page using its metadata
 def handle_file(file, root)
   return if file.extname != ".html"
   html = File.open file do |f| Nokogiri::HTML f end
@@ -37,6 +39,7 @@ def handle_file(file, root)
   file.write html.to_s
 end
 
+# Create link from page to tag index
 def create_tag(tag)
   node = Nokogiri::HTML.fragment ""
   Nokogiri::HTML::Builder.with(node) do
@@ -50,6 +53,7 @@ def create_tag(tag)
   Nokogiri::HTML.fragment node.to_html
 end
 
+# Create link from tag index to page
 def link_page(tags_file, page_file)
   node = Nokogiri::HTML.fragment ""
   Nokogiri::HTML::Builder.with(node) do
@@ -73,11 +77,11 @@ tags_dir.mkdir
 
 handle_directory root, root
 
+# Improve tag indices
 tags_dir.each_child do |file|
+  tags = file.read
   title = file.basename.sub_ext ""
-
-  data = file.read
-  file.write "<h1>##{title}</h1>" + "<ul>#{data}</ul>"
+  file.write "<h1>##{title}</h1>" + "<ul>#{tags}</ul>"
 
   IO.popen([
     "pandoc",
