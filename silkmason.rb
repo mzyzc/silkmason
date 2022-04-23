@@ -4,7 +4,9 @@ require "fileutils"
 require "toml"
 require "pathname"
 
-def hidden?(file) file.basename.to_path.start_with? "." end
+class Pathname
+  def hidden?() self.basename.to_path.start_with? "." end
+end
 
 # Recursively explore directory looking for files
 def handle_directory(in_dir, out_dir, config)
