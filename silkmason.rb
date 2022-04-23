@@ -6,11 +6,11 @@ require "pathname"
 
 def handle_directory(in_dir, out_dir, config)
   in_dir.each_child do |in_file|
-    next if in_file.basename.to_s.start_with? "."
+    next if in_file.basename.to_path.start_with? "."
 
     if in_file.directory?
-      out_file = Pathname.new out_dir + in_file.relative_path_from(in_dir)
-      Dir.mkdir out_file unless out_file.exist?
+      out_file = Pathname.new out_dir + in_file.basename
+      out_file.mkdir unless out_file.exist?
       handle_directory in_file, out_file, config
     elsif in_file.file?
       handle_file in_file, out_dir, config
@@ -19,9 +19,6 @@ def handle_directory(in_dir, out_dir, config)
 end
 
 def handle_file(in_file, out_dir, config)
-  filters = config["filters"].map do |f| ["--lua-filter",  f] end
-  filters = filters.flatten
-
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
@@ -29,8 +26,8 @@ def handle_file(in_file, out_dir, config)
       "pandoc", *config["pandoc_args"],
       "--template", config["template"],
       *config["filters"],
-      "-i", in_file.to_s,
-      "-o", out_file.to_s,
+      "-i", in_file.to_path,
+      "-o", out_file.to_path,
     ])
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
@@ -40,8 +37,8 @@ def handle_file(in_file, out_dir, config)
       *config["filters"],
       "-f", "html+raw_html",
       "-t", "html+raw_html",
-      "-i", in_file.to_s,
-      "-o", out_file.to_s,
+      "-i", in_file.to_path,
+      "-o", out_file.to_path,
     ])
   else
     out_file = Pathname.new out_dir + in_file.basename

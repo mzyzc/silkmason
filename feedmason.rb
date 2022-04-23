@@ -7,15 +7,15 @@ require "pathname"
 def create_entry(path, root, domain)
   entry_path = root + path
   
-  exceptions = ["index.html"]
-  return if (not entry_path.file?) or (entry_path.extname != ".html") or (exceptions.include? entry_path.basename.to_s)
+  blacklist = ["index.html"]
+  return if (not entry_path.file?) or (entry_path.extname != ".html") or (blacklist.include? entry_path.basename.to_path)
   
-  html = File.open entry_path do |f| Nokogiri::HTML f end
-  title = (html.at "h1")
-  summary = (html.at "main")
+  html = entry_path.open do |f| Nokogiri::HTML f end
+  title = html.at "h1"
+  summary = html.at "main p"
   pub_date = html.at "meta[name='dcterms.date']"
 
-  return unless title or summary or pub_date
+  return unless title
   
   node = Nokogiri::XML.fragment ""
   Nokogiri::XML::Builder.with(node) do
@@ -32,13 +32,13 @@ def create_entry(path, root, domain)
 end
 
 def create_feed(path, root, domain, author)
-  html = File.open (root + path + "index.html") do |f| Nokogiri::HTML f end
-  title = (html.at "title").content
+  html = (root + path + "index.html").open do |f| Nokogiri::HTML f end
+  title = (html.at "title")
   
   doc = Nokogiri::XML::Builder.new(:encoding => "utf-8") do
     feed(:xmlns => "http://www.w3.org/2005/Atom") {
       id_ ((Pathname.new domain) + path)
-      title title
+      title title.content
       author author
       link(:href => "https://#{domain}/#{path}/feed.xml")
     }
@@ -69,10 +69,10 @@ def combine_feeds(paths, root, domain, author)
   
   feed = doc.at "feed"
   paths.each do |path|
-    feeds = File.open (root + path + "feed.xml") do |f| Nokogiri::XML f end
-    (feeds.search "entry").each do |entry|
+    entries = (root + path + "feed.xml").open do |f| Nokogiri::XML f end
+    (entries.search "entry")&.each do |entry|
       feed << entry
-    end if feeds.at "entry"
+    end
   end
   
   doc
@@ -84,14 +84,12 @@ author = config["feedmason"]["author"]
 root = (Pathname.new config["feedmason"]["root"]).expand_path
 feeds = config["feedmason"]["feeds"].map do |f| (Pathname.new f) end
   
-  # Generate individual feeds
-  feeds.each do |feed_path|
-    path = root + feed_path + "feed.xml"
-    feed = create_feed feed_path, root, domain, author
-    File.write path, feed.to_s
-  end
-  
-  # Generate combined feed
-  combined_path = root + "feed.xml"
-  combined_feed = combine_feeds feeds, root, domain, author
-  File.write combined_path, combined_feed.to_xml
+# Generate individual feeds
+feeds.each do |feed_path|
+  feed = create_feed feed_path, root, domain, author
+  (root + feed_path + "feed.xml").write feed.to_s
+end
+
+# Generate combined feed
+combined_feed = combine_feeds feeds, root, domain, author
+(root + "feed.xml").write combined_feed.to_s
