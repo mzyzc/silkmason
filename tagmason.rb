@@ -53,10 +53,11 @@ end
 def link_page(tags_file, page_file)
   node = Nokogiri::HTML.fragment ""
   Nokogiri::HTML::Builder.with(node) do
-    a(:href => "/#{page_file}") {
-      text page_file.basename
+    li {
+      a(:href => "/#{page_file}") {
+        text "#{page_file.parent}/#{page_file.basename}"
+      }
     }
-    br
   end
   node = Nokogiri::HTML.fragment node.to_xml
 
@@ -71,3 +72,20 @@ FileUtils.rm_rf tags_dir unless not tags_dir.exist?
 Dir.mkdir tags_dir
 
 handle_directory root, root
+
+tags_dir.each_child do |f|
+  title = f.basename.sub_ext ""
+
+  data = f.read
+  f.write "<h1>##{title}</h1>" + "<ul>#{data}</ul>"
+
+  IO.popen([
+    "pandoc",
+    "--metadata", "title=##{title}",
+    "--template", config["template"],
+    "-f", "html+raw_html",
+    "-t", "html+raw_html",
+    "-i", f.to_s,
+    "-o", f.to_s,
+  ])
+end
