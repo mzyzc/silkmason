@@ -19,20 +19,25 @@ def handle_directory(in_dir, out_dir, config)
 end
 
 def handle_file(in_file, out_dir, config)
-  args = config["pandoc_args"].split " "
+  filters = config["filters"].map do |f| ["--lua-filter",  f] end
+  filters = filters.flatten
 
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
     IO.popen([
-      "pandoc", *args,
+      "pandoc", *config["pandoc_args"],
+      "--template", config["template"],
+      *config["filters"],
       "-i", in_file.to_s,
       "-o", out_file.to_s,
     ])
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
     IO.popen([
-      "pandoc", *args,
+      "pandoc", *config["pandoc_args"],
+      "--template", config["template"],
+      *config["filters"],
       "-f", "html+raw_html",
       "-t", "html+raw_html",
       "-i", in_file.to_s,
@@ -47,7 +52,8 @@ def handle_file(in_file, out_dir, config)
 end
 
 config = TOML.load_file "config.toml"
-input_dir = Pathname.new(if ARGV.length >= 2 then ARGV[1] else config["input_dir"] end).expand_path
-output_dir = Pathname.new(if ARGV.length >= 3 then ARGV[2] else config["output_dir"] end).expand_path
+config["input_dir"] = Pathname.new(if ARGV.length >= 2 then ARGV[1] else config["input_dir"] end).expand_path
+config["output_dir"] = Pathname.new(if ARGV.length >= 3 then ARGV[2] else config["output_dir"] end).expand_path
+config["filters"] = (config["filters"].map do |f| ["--lua-filter",  f] end).flatten
 
-handle_directory input_dir, output_dir, config
+handle_directory config["input_dir"], config["output_dir"], config

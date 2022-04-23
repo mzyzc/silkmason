@@ -1,9 +1,14 @@
 input_dir = ""
 output_dir = ""
-pandoc_args = "--standalone --to=html --lua-filter ./filters/set_title.lua --lua-filter ./filters/set_description.lua --lua-filter ./filters/format_date.lua --lua-filter ./filters/link_feed.lua"
+template = "html"
+filters = ["filters/set_title.lua", "filters/set_description.lua", "filters/format_date.lua", "filters/link_feed"]
+pandoc_args = "--standalone --to=html"
 
 [feedmason]
 domain = ""
 author = ""
 root = ""
 feeds = []
+
+[tagmason]
+root = ""
