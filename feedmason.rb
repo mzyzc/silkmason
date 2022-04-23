@@ -11,15 +11,17 @@ def create_entry(path, root, domain)
   return if (not entry_path.file?) or (entry_path.extname != ".html") or (exceptions.include? entry_path.basename.to_s)
   
   html = File.open entry_path do |f| Nokogiri::HTML f end
-  title = (html.at "h1").content rescue nil
-  summary = (html.at "main").at "p" rescue nil
-  pub_date = html.at "meta[name='dcterms.date']" rescue nil
+  title = (html.at "h1")
+  summary = (html.at "main")
+  pub_date = html.at "meta[name='dcterms.date']"
+
+  return unless title or summary or pub_date
   
   node = Nokogiri::XML.fragment ""
   Nokogiri::XML::Builder.with(node) do
     entry {
       id_ (Pathname.new domain) + path
-      title title
+      title title.content
       link(:href => "https://#{domain}/#{path}")
       summary summary.content if summary
       published pub_date["content"] if pub_date
