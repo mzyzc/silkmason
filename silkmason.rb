@@ -28,16 +28,16 @@ def handle_file(in_file, out_dir, config)
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
-    IO.popen([
+    IO.popen [
       "pandoc", *config["pandoc_args"],
       "--template", config["template"],
       *config["filters"],
       "-i", in_file.to_path,
       "-o", out_file.to_path,
-    ])
+    ]
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext(".html")
-    IO.popen([
+    IO.popen [
       "pandoc", *config["pandoc_args"],
       "--template", config["template"],
       *config["filters"],
@@ -45,7 +45,7 @@ def handle_file(in_file, out_dir, config)
       "-t", "html+raw_html",
       "-i", in_file.to_path,
       "-o", out_file.to_path,
-    ])
+    ]
   else
     out_file = Pathname.new out_dir + in_file.basename
     FileUtils.cp in_file, out_file

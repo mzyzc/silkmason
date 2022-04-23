@@ -83,7 +83,7 @@ tags_dir.each_child do |file|
   title = file.basename.sub_ext ""
   file.write "<h1>##{title}</h1>" + "<ul>#{tags}</ul>"
 
-  IO.popen([
+  IO.popen [
     "pandoc",
     "--template", config["template"],
     *config["filters"],
@@ -91,5 +91,5 @@ tags_dir.each_child do |file|
     "-t", "html+raw_html",
     "-i", file.to_path,
     "-o", file.to_path,
-  ])
+  ]
 end
