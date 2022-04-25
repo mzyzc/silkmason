@@ -2,7 +2,7 @@
 
 local title
 
-function get_title (header)
+local function get_title (header)
     if not title and header.level == 1 then
         title = header.content
     end

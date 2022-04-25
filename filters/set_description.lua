@@ -2,7 +2,7 @@
 
 local description
 
-function get_description (paragraph)
+local function get_description (paragraph)
     if not description then
         description = paragraph.content
     end
