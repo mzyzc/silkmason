@@ -8,7 +8,8 @@ class Pathname
   def hidden?() self.basename.to_path.start_with? "." end
 end
 
-def convert(in_file, out_file, template, filters, args, from=nil, to=nil)
+# Convert a document between formats with pandoc
+def convert(in_file, out_file, template, filters, args)
   command = [
     "pandoc", *args,
     "--template", template,
@@ -16,8 +17,6 @@ def convert(in_file, out_file, template, filters, args, from=nil, to=nil)
     "-i", in_file.to_path,
     "-o", out_file.to_path,
   ]
-  command += ["-f", from[:from]] if from
-  command += ["-t", to[:to]] if to
   IO.popen command
 end
 
@@ -44,7 +43,8 @@ def handle_file(in_file, out_dir, config)
     convert in_file, out_file, config["template"], config["filters"], config["pandoc_args"]
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
-    convert in_file, out_file, config["template"], config["filters"], config["pandoc_args"], to: "html+raw_html", from: "html+raw_html"
+    args = config["pandoc_args"] + ["--from", "html+raw_html"] + ["--to", "html+raw_html"]
+    convert in_file, out_file, config["template"], config["filters"], args
   else
     out_file = Pathname.new out_dir + in_file.basename
     FileUtils.cp in_file, out_file
