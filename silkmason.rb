@@ -8,6 +8,19 @@ class Pathname
   def hidden?() self.basename.to_path.start_with? "." end
 end
 
+def convert(in_file, out_file, template, filters, args, from=nil, to=nil)
+  command = [
+    "pandoc", *args,
+    "--template", template,
+    *filters,
+    "-i", in_file.to_path,
+    "-o", out_file.to_path,
+  ]
+  command += ["-f", from[:from]] if from
+  command += ["-t", to[:to]] if to
+  IO.popen command
+end
+
 # Recursively explore directory looking for files
 def handle_directory(in_dir, out_dir, config)
   in_dir.each_child do |in_file|
@@ -28,30 +41,16 @@ def handle_file(in_file, out_dir, config)
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
-    IO.popen [
-      "pandoc", *config["pandoc_args"],
-      "--template", config["template"],
-      *config["filters"],
-      "-i", in_file.to_path,
-      "-o", out_file.to_path,
-    ]
+    convert in_file, out_file, config["template"], config["filters"], config["pandoc_args"]
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
-    IO.popen [
-      "pandoc", *config["pandoc_args"],
-      "--template", config["template"],
-      *config["filters"],
-      "-f", "html+raw_html",
-      "-t", "html+raw_html",
-      "-i", in_file.to_path,
-      "-o", out_file.to_path,
-    ]
+    convert in_file, out_file, config["template"], config["filters"], config["pandoc_args"], to: "html+raw_html", from: "html+raw_html"
   else
     out_file = Pathname.new out_dir + in_file.basename
     FileUtils.cp in_file, out_file
   end
 
-    puts out_file
+  puts out_file
 end
 
 config = TOML.load_file "config.toml"
