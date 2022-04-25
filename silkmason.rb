@@ -5,19 +5,20 @@ require "toml"
 require "pathname"
 
 class Pathname
-  def hidden?() self.basename.to_path.start_with? "." end
-end
+  def convert(out_file, template, filters, args)
+    command = [
+      "pandoc", *args,
+      "--template", template,
+      *filters,
+      "-i", self.to_path,
+      "-o", out_file.to_path,
+    ]
+    IO.popen command
+  end
 
-# Convert a document between formats with pandoc
-def convert(in_file, out_file, template, filters, args)
-  command = [
-    "pandoc", *args,
-    "--template", template,
-    *filters,
-    "-i", in_file.to_path,
-    "-o", out_file.to_path,
-  ]
-  IO.popen command
+  def hidden?()
+    self.basename.to_path.start_with? "."
+  end
 end
 
 # Recursively explore directory looking for files
@@ -40,11 +41,11 @@ def handle_file(in_file, out_dir, config)
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
-    convert in_file, out_file, config["template"], config["filters"], config["pandoc_args"]
+    in_file.convert out_file, config["template"], config["filters"], config["pandoc_args"]
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
     args = config["pandoc_args"] + ["--from", "html+raw_html"] + ["--to", "html+raw_html"]
-    convert in_file, out_file, config["template"], config["filters"], args
+    in_file.convert out_file, config["template"], config["filters"], args
   else
     out_file = Pathname.new out_dir + in_file.basename
     FileUtils.cp in_file, out_file
