@@ -16,12 +16,16 @@ class Pathname
     ]
     IO.popen command
   end
+
+  def hidden?()
+    self.basename.to_path.start_with? "."
+  end
 end
 
 # Recursively explore directory looking for files
 def handle_directory(dir, root)
   dir.each_child do |file|
-    next if file.basename.to_path.start_with? "."
+    next if file.hidden?
 
     if file.directory?
       handle_directory file, root
