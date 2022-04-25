@@ -5,11 +5,11 @@ function Meta(meta)
 
     -- Split date string into year, month, and day
     local date = {}
-    for unit in string.gmatch(meta.date[1].text, "([^"..'-'.."]+)") do
-            table.insert(date, unit)
+    for unit in meta.date[1].text:gmatch ("([^-]+)") do
+            table.insert (date, unit)
     end
 
-    date = os.time ({year = date[1], month = date[2], day = date[3]})
+    date = os.time {year = date[1], month = date[2], day = date[3]}
     meta.datef = os.date ("%e %B %Y", date)
     return meta
   end
