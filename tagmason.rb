@@ -5,6 +5,19 @@ require "toml"
 require "pathname"
 require "fileutils"
 
+class Pathname
+  def convert(out_file, template, filters, args)
+    command = [
+      "pandoc", *args,
+      "--template", template,
+      *filters,
+      "-i", self.to_path,
+      "-o", out_file.to_path,
+    ]
+    IO.popen command
+  end
+end
+
 # Recursively explore directory looking for files
 def handle_directory(dir, root)
   dir.each_child do |file|
@@ -77,19 +90,10 @@ tags_dir.mkdir
 
 handle_directory root, root
 
-# Improve tag indices
+# Improve tag index pages
 tags_dir.each_child do |file|
   tags = file.read
   title = file.basename.sub_ext ""
   file.write "<h1>##{title}</h1>" + "<ul>#{tags}</ul>"
-
-  IO.popen [
-    "pandoc",
-    "--template", config["template"],
-    *config["filters"],
-    "-f", "html+raw_html",
-    "-t", "html+raw_html",
-    "-i", file.to_path,
-    "-o", file.to_path,
-  ]
+  file.convert file, config["template"], config["filters"], ["--from", "html+raw_html"] + ["--to", "html+raw_html"]
 end
