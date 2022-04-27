@@ -43,3 +43,4 @@ Source and destination directories can be overridden with command-line arguments
 - `pandoc`
 - `toml`
 - `nokogiri` (FeedMason)
+- `yq` (set_img_size.lua)
