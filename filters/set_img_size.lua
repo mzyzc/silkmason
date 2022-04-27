@@ -14,7 +14,7 @@ root = root:gsub ("~", os.getenv ("HOME"))
 root = root:gsub ("\n", "")
 
 function Image (img)
-    if img.src:match ("^https://") then
+    if img.src:match ("^https?://") then
         return
     end
 
