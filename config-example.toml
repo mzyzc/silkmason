@@ -1,7 +1,8 @@
 input_dir = ""
 output_dir = ""
+domain = ""
 template = "html"
-filters = ["filters/set_title.lua", "filters/set_description.lua", "filters/format_date.lua", "filters/link_feed.lua", "filters/add_link_ext.lua]
+filters = ["filters/set_title.lua", "filters/set_description.lua", "filters/format_date.lua", "filters/link_feed.lua", "filters/add_link_ext.lua"]
 pandoc_args = ["--standalone", --to=html"]
 
 [feedmason]

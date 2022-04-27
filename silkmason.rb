@@ -5,13 +5,18 @@ require "toml"
 require "pathname"
 
 class Pathname
-  def convert(out_file, template, filters, args)
+  def convert(out_file, template, filters, args, config)
+    url = "https://#{config["domain"]}/"
+    url += "#{out_file.relative_path_from config["output_dir"]}"
+    url.gsub! /index\.html$/, ""
+
     command = [
       "pandoc", *args,
       "--template", template,
       *filters,
       "-i", self.to_path,
       "-o", out_file.to_path,
+      "-M", "url=#{url}",
     ]
     IO.popen command
   end
@@ -41,11 +46,11 @@ def handle_file(in_file, out_dir, config)
   case in_file.extname
   when ".md"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
-    in_file.convert out_file, config["template"], config["filters"], config["pandoc_args"]
+    in_file.convert out_file, config["template"], config["filters"], config["pandoc_args"], config
   when ".html"
     out_file = (Pathname.new out_dir + in_file.basename).sub_ext ".html"
     args = config["pandoc_args"] + ["--from", "html+raw_html"] + ["--to", "html+raw_html"]
-    in_file.convert out_file, config["template"], config["filters"], args
+    in_file.convert out_file, config["template"], config["filters"], args, config
   else
     out_file = Pathname.new out_dir + in_file.basename
     FileUtils.cp in_file, out_file
