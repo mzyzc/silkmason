@@ -37,10 +37,11 @@ Source and destination directories can be overridden with command-line arguments
 ---
 
 - `tagmason.root` `string`: the directory where the website is located (usually the same as `output_dir`)
+- `tagmason.filters` `array:string`: Lua pandoc filters to run when generating tag index pages
 
 ## Dependencies
 
 - `pandoc`
 - `toml`
 - `nokogiri` (FeedMason)
-- `yq` (set_img_size.lua)
+- `yq` (various pandoc filters)

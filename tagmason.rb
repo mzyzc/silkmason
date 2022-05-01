@@ -85,7 +85,7 @@ def link_page(tags_file, page_file)
 end
 
 config = TOML.load_file "config.toml"
-config["filters"] = (config["filters"].map do |f| ["--lua-filter",  f] end).flatten
+config["filters"] = (config["tagmason"]["filters"].map do |f| ["--lua-filter",  f] end).flatten
 root = (Pathname.new config["tagmason"]["root"]).expand_path
 
 tags_dir = root + (Pathname.new "tags")

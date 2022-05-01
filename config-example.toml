@@ -2,7 +2,7 @@ input_dir = ""
 output_dir = ""
 domain = ""
 template = "html"
-filters = ["filters/set_title.lua", "filters/set_description.lua", "filters/format_date.lua", "filters/link_feed.lua", "filters/add_link_ext.lua"]
+filters = ["filters/set_title.lua", "filters/set_description.lua", "filters/format_date.lua", "filters/link_feed.lua", "filters/add_link_ext.lua", "filters/add_breadcrumbs.lua"]
 pandoc_args = ["--standalone", --to=html"]
 
 [feedmason]
@@ -13,3 +13,4 @@ feeds = []
 
 [tagmason]
 root = ""
+filters = ["filters/set_title.lua", "filters/add_link_ext.lua", "filters/set_img_size.lua"]
