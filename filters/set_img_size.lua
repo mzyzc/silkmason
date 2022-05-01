@@ -1,15 +1,6 @@
 -- Set 'width' and 'height' attributes of image elements
 
-local function run (command)
-    local handle = io.popen (command)
-    if handle == nil then return end
-    local data = handle:read ("*a")
-    handle:close ()
-
-    return data
-end
-
-local root = (run ("tomlq -r .input_dir config.toml")):gsub ("~", os.getenv ("HOME"))
+local root = pandoc.pipe ("tomlq", {"-r", ".input_dir", "config.toml"}, "")
 root = root:gsub ("~", os.getenv ("HOME"))
 root = root:gsub ("\n", "")
 
@@ -26,8 +17,8 @@ function Image (img)
         path = pandoc.path.make_relative (img.src, root)
     end
 
-    img.attributes["width"] = run ("identify -format '%w' "..path)
-    img.attributes["height"] = run ("identify -format '%h' "..path)
+    img.attributes["width"] = pandoc.pipe ("identify", {"-format", "%w", path}, "")
+    img.attributes["height"] = pandoc.pipe ("identify", {"-format", "%h", path}, "")
 
     return img
 end
