@@ -9,7 +9,9 @@ def create_entry(path, root, domain)
   entry_path = root + path
   
   blacklist = ["index.html"]
-  return if (not entry_path.file?) or (entry_path.extname != ".html") or (blacklist.include? entry_path.basename.to_path)
+  return unless entry_path.file?
+  return if entry_path.extname != ".html"
+  return if blacklist.include? entry_path.basename.to_path
   
   html = entry_path.open do |f| Nokogiri::HTML f end
   title = html.at "h1"
@@ -49,7 +51,8 @@ def create_feed(path, root, domain, author)
   
   feed = doc.at "feed"
   (root + path).each_child do |entry_file|
-    next if (entry_file.extname != ".html") or (entry_file.basename == "index.html")
+    next if entry_file.basename == "index.html"
+    next if entry_file.extname != ".html"
     
     entry = create_entry (entry_file.relative_path_from root), root, domain
     (feed << entry) if entry
@@ -86,7 +89,7 @@ domain = config["feedmason"]["domain"]
 author = config["feedmason"]["author"]
 root = (Pathname.new config["feedmason"]["root"]).expand_path
 feeds = config["feedmason"]["feeds"].map do |f| (Pathname.new f) end
-  
+
 # Generate individual feeds
 feeds.each do |feed_path|
   feed = create_feed feed_path, root, domain, author
