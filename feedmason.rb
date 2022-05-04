@@ -32,6 +32,10 @@ def create_entry(path, root, domain)
       id_ (Pathname.new domain) + path
       title title.content
       link(:href => "https://#{domain}/#{path}")
+      category(
+        :term => path.dirname,
+        :scheme => "https://#{((Pathname.new domain) + path.dirname).to_path}"
+      )
       summary summary.content if summary
       published pub_date["content"] if pub_date
     }
