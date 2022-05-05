@@ -1,6 +1,14 @@
 -- Set 'width' and 'height' attributes of image elements
 
-local root = pandoc.pipe ("tomlq", {"-r", ".input_dir", "config.toml"}, "")
+local toml = require "toml"
+
+local file = io.open ("config.toml", "r")
+io.input (file)
+local data = io.read("*a")
+data = toml.parse (data)
+file:close ()
+
+local root = data ["input_dir"]
 root = root:gsub ("~", os.getenv ("HOME"))
 root = root:gsub ("\n", "")
 

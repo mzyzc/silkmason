@@ -44,4 +44,5 @@ Source and destination directories can be overridden with command-line arguments
 - `pandoc`
 - `toml`
 - `nokogiri` (FeedMason)
-- `yq` (various pandoc filters)
+- `lua-toml` (filters)
+- `imagemagick` (filters)
