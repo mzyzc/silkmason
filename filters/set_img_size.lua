@@ -17,6 +17,10 @@ function Image (img)
         return
     end
 
+    if img.src:match ("%.mp4$") then
+        return
+    end
+
     local path
 
     if img.src:match ("^/") then
