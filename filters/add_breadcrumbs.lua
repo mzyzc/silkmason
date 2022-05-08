@@ -22,7 +22,7 @@ function Pandoc(doc)
     local path_list = pandoc.path.split (path_string)
 
     -- Only affect pages that are deep enough
-    if #path_list < 2 then return end
+    if #path_list < 3 then return end
 
     local links = {}
 
