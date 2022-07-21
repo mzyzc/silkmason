@@ -60,8 +60,8 @@ def handle_file(in_file, out_dir, config)
 end
 
 config = TOML.load_file "config.toml"
-config["input_dir"] = Pathname.new(if ARGV.length >= 2 then ARGV[1] else config["input_dir"] end).expand_path
-config["output_dir"] = Pathname.new(if ARGV.length >= 3 then ARGV[2] else config["output_dir"] end).expand_path
+config["input_dir"] = Pathname.new(ARGV[1] ||= config["input_dir"]).expand_path
+config["output_dir"] = Pathname.new(ARGV[2] ||= config["output_dir"]).expand_path
 config["filters"] = (config["filters"].map do |f| ["--lua-filter",  f] end).flatten
 
 handle_directory config["input_dir"], config["output_dir"], config
