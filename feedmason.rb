@@ -37,6 +37,7 @@ def create_entry(path, root, domain)
         :scheme => "https://#{((Pathname.new domain) + path.dirname).to_path}"
       )
       summary summary.content if summary
+      updated pub_date["content"] if pub_date
       published pub_date["content"] if pub_date
     }
   end
